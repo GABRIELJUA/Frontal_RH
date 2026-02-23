@@ -1,0 +1,216 @@
+<div class="space-y-8">
+
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h2 class="text-xl font-semibold text-slate-800 dark:text-white">
+        Panel de Control
+      </h2>
+      <p class="text-xs text-slate-400 mt-1">
+        Gestión Integral del Capital Humano - Hotel Posada de Tampico
+      </p>
+    </div>
+    <div class="flex gap-3"></div>
+  </header>
+
+
+  <!-- Cards resumen -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+    <!-- CARD -->
+    <div *ngIf="!loading"
+      class="bg-white dark:bg-[#111111]
+             p-6 rounded-2xl
+             border border-slate-200 dark:border-white/10
+             shadow-sm dark:shadow-none">
+
+      <p class="text-xs text-slate-400 uppercase tracking-wide">
+        Total empleados
+      </p>
+
+      <h3 class="text-2xl font-semibold text-slate-800 dark:text-white mt-2">
+        {{ summary.empleados }}
+      </h3>
+
+      <p class="text-[11px] text-slate-400 mt-1">
+        Registrados
+      </p>
+    </div>
+
+    <div *ngIf="!loading"
+      class="bg-white dark:bg-[#111111]
+             p-6 rounded-2xl
+             border border-slate-200 dark:border-white/10">
+
+      <p class="text-xs text-slate-400 uppercase tracking-wide">
+        Solicitudes
+      </p>
+
+      <h3 class="text-2xl font-semibold text-slate-800 dark:text-white mt-2">
+        {{ summary.vacaciones }}
+      </h3>
+
+      <p class="text-[11px] text-slate-400 mt-1">
+        Solicitudes
+      </p>
+    </div>
+
+    <div *ngIf="!loading"
+      class="bg-white dark:bg-[#111111]
+             p-6 rounded-2xl
+             border border-slate-200 dark:border-white/10">
+
+      <p class="text-xs text-slate-400 uppercase tracking-wide">
+        Buzón de sugerencias
+      </p>
+
+      <h3 class="text-2xl font-semibold text-slate-800 dark:text-white mt-2">
+        {{ summary.sugerencias }}
+      </h3>
+
+      <p class="text-[11px] text-slate-400 mt-1">
+        Opiniones
+      </p>
+    </div>
+
+    <div *ngIf="!loading"
+      class="bg-white dark:bg-[#111111]
+             p-6 rounded-2xl
+             border border-slate-200 dark:border-white/10">
+
+      <p class="text-xs text-slate-400 uppercase tracking-wide">
+        Comunicados
+      </p>
+
+      <h3 class="text-2xl font-semibold text-slate-800 dark:text-white mt-2">
+        {{ summary.comunicados }}
+      </h3>
+
+      <p class="text-[11px] text-slate-400 mt-1">
+        Publicaciones
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- Contenido principal -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Lateral -->
+    <div class="space-y-6">
+
+      <div class="bg-white dark:bg-[#111111]
+                  p-6 rounded-2xl
+                  border border-slate-200 dark:border-white/10">
+
+        <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+          <span class="w-2 h-6 bg-orange-500 rounded-full"></span>
+          Accesos rápidos
+        </h3>
+
+        <div class="grid grid-cols-2 gap-3">
+
+          <!-- BOTÓN -->
+          <button routerLink="/admin/employees"
+            class="flex flex-col items-center justify-center
+                   p-4 rounded-2xl
+                   bg-slate-50 dark:bg-[#181818]
+                   border border-slate-100 dark:border-white/10
+                   hover:bg-orange-50 dark:hover:bg-white/5
+                   transition-all">
+
+            <span class="text-[10px] font-bold
+                         text-slate-600 dark:text-slate-300 uppercase">
+              Empleados
+            </span>
+          </button>
+
+          <button
+            class="flex flex-col items-center justify-center
+                   p-4 rounded-2xl
+                   bg-slate-50 dark:bg-[#181818]
+                   border border-slate-100 dark:border-white/10
+                   hover:bg-blue-50 dark:hover:bg-white/5
+                   transition-all">
+
+            <span class="text-[10px] font-bold
+                         text-slate-600 dark:text-slate-300 uppercase">
+              Solicitudes
+            </span>
+          </button>
+
+          <button
+            class="flex flex-col items-center justify-center
+                   p-4 rounded-2xl
+                   bg-slate-50 dark:bg-[#181818]
+                   border border-slate-100 dark:border-white/10
+                   hover:bg-emerald-50 dark:hover:bg-white/5
+                   transition-all">
+
+            <span class="text-[10px] font-bold
+                         text-slate-600 dark:text-slate-300 uppercase">
+              Comunicados
+            </span>
+          </button>
+
+          <button
+            class="flex flex-col items-center justify-center
+                   p-4 rounded-2xl
+                   bg-slate-50 dark:bg-[#181818]
+                   border border-slate-100 dark:border-white/10
+                   hover:bg-purple-50 dark:hover:bg-white/5
+                   transition-all">
+
+            <span class="text-[10px] font-bold
+                         text-slate-600 dark:text-slate-300 uppercase">
+              Biblioteca
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Distribución -->
+    <div class="bg-white dark:bg-[#111111]
+                p-6 rounded-2xl
+                border border-slate-200 dark:border-white/10">
+
+      <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-6">
+        Distribución por Departamento
+      </h3>
+
+      <div *ngIf="!loading" class="space-y-6">
+
+        <div *ngFor="let d of distribucionDepartamentos">
+
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {{ d.departamento }}
+            </span>
+
+            <span class="text-sm text-slate-400">
+              {{ d.total }} empleados
+            </span>
+          </div>
+
+          <!-- Barra fondo -->
+          <div class="w-full h-2 bg-slate-200 dark:bg-[#222222] rounded-full overflow-hidden">
+
+            <!-- Barra fill -->
+            <div class="h-2 bg-slate-900 dark:bg-white
+                        rounded-full transition-all duration-500"
+              [style.width.%]="(d.total / summary.empleados) * 100">
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

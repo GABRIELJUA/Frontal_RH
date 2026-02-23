@@ -1,0 +1,96 @@
+<div class="w-full bg-white">
+  
+<section class="w-full bg-white"
+         aria-label="Promociones y navegación principal">
+
+  <!-- CAROUSEL -->
+  <div class="relative w-full h-[400px] md:h-[550px] overflow-hidden bg-slate-200"
+       role="region"
+       aria-roledescription="carousel"
+       aria-label="Galería principal del hotel">
+
+    <ng-container *ngFor="let image of images; let i = index; trackBy: trackByImage">
+
+      <a [routerLink]="image.route"
+         class="absolute inset-0 w-full h-full transition-opacity duration-1000"
+         [class.opacity-100]="i === currentImageIndex"
+         [class.z-10]="i === currentImageIndex"
+         [class.pointer-events-auto]="i === currentImageIndex"
+         [class.opacity-0]="i !== currentImageIndex"
+         [class.z-0]="i !== currentImageIndex"
+         [class.pointer-events-none]="i !== currentImageIndex"
+         [attr.aria-hidden]="i !== currentImageIndex">
+
+        <img [src]="image.url"
+             [alt]="image.url"
+             class="w-full h-full object-contain"
+             [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+             decoding="async"
+             width="1920"
+             height="1080">
+      </a>
+
+    </ng-container>
+
+
+    <!-- CONTROLES -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20"
+         role="tablist"
+         aria-label="Selector de imágenes">
+
+      <button *ngFor="let image of images; let i = index; trackBy: trackByImage"
+              (click)="setSlide(i)"
+              type="button"
+              role="tab"
+              [attr.aria-selected]="i === currentImageIndex"
+              [attr.aria-label]="'Ir a imagen ' + (i + 1)"
+              class="transition-all duration-300 rounded-full h-3 focus:outline-none focus:ring-2 focus:ring-white"
+              [ngClass]="{
+                'w-8 bg-white': i === currentImageIndex, 
+                'w-3 bg-white/40': i !== currentImageIndex
+              }">
+      </button>
+
+    </div>
+
+    <!-- GRADIENT -->
+    <div class="absolute bottom-0 w-full h-20 bg-gradient-to-t from-black/40 to-transparent"
+         aria-hidden="true">
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- INFORMACIÓN -->
+<section class="bg-[#8d765e] py-16 text-white font-['Plus_Jakarta_Sans']"
+         aria-labelledby="informacion-title">
+
+  <div class="max-w-4xl mx-auto px-6">
+
+    <header class="text-center mb-10">
+      <h2 id="informacion-title"
+          class="text-3xl font-bold uppercase tracking-wider">
+        Información
+      </h2>
+    </header>
+
+    <article class="text-lg opacity-90 leading-relaxed space-y-6">
+
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit...
+      </p>
+
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit...
+      </p>
+
+    </article>
+
+  </div>
+</section>
+</div>
+
+
+
