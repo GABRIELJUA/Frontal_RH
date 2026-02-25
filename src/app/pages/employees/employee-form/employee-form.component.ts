@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core'; // 1. Importar OnInit
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router'; // 2. Importar ActivatedRoute
 import { RouterModule } from '@angular/router';
@@ -55,6 +55,11 @@ export class EmployeeFormComponent implements OnInit {
   // ================== ESTADO ==================
   isEditing = false;
   errorMessage: string | null = null;
+  toast = {
+    show: false,
+    message: '',
+    type: 'info' as 'success' | 'error' | 'info'
+  };
 
   // ================== MODELO ==================
   employee: Employee = {
@@ -115,7 +120,7 @@ export class EmployeeFormComponent implements OnInit {
             emp.fecha_nacimiento?.toString().substring(0, 10);
         },
         error: () => {
-          alert('No se pudo cargar el empleado');
+          this.toastMsg('No se pudo cargar el empleado', 'error');
           this.router.navigate(['/admin/employees']);
         }
       });
@@ -147,12 +152,12 @@ export class EmployeeFormComponent implements OnInit {
 
       this.employeeService.updateEmployee(+id, this.employee).subscribe({
         next: () => {
-          alert('Empleado actualizado correctamente');
+          this.toastMsg('Empleado actualizado correctamente', 'success');
           this.router.navigate(['/admin/employees']);
         },
         error: (err) => {
           console.error('Error al actualizar:', err);
-          alert(err.error?.message || 'Error al actualizar empleado');
+          this.toastMsg(err.error?.message || 'Error al actualizar empleado', 'error');
         }
       });
       return;
@@ -160,17 +165,28 @@ export class EmployeeFormComponent implements OnInit {
 
     this.employeeService.addEmployee(this.employee).subscribe({
       next: () => {
-        alert('Empleado registrado exitosamente');
+        this.toastMsg('Empleado registrado exitosamente', 'success');
         this.router.navigate(['/admin/employees']);
       },
       error: (err) => {
         console.error('Error al registrar:', err);
-        alert(err.error?.message || 'Error al registrar empleado');
+        this.toastMsg(err.error?.message || 'Error al registrar empleado', 'error');
       }
     });
   }
 
   
+
+  toastMsg(message: string, type: 'success' | 'error' | 'info' = 'info') {
+    this.toast.message = message;
+    this.toast.type = type;
+    this.toast.show = true;
+
+    setTimeout(() => {
+      this.toast.show = false;
+    }, 3000);
+  }
+
   // ================== STEPS ==================
   nextStep() {
     if (this.step === 1) {
