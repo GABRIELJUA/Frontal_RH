@@ -1,3 +1,16 @@
+<div *ngIf="toast.show" class="fixed bottom-5 right-5 z-[999] min-w-[260px] max-w-sm">
+  <div class="text-white px-4 py-3 rounded-lg shadow-lg text-sm flex items-center gap-2" [ngClass]="{
+        'bg-emerald-500': toast.type === 'success',
+        'bg-red-500': toast.type === 'error',
+        'bg-slate-800': toast.type === 'info'
+      }">
+    <span *ngIf="toast.type==='success'">✔</span>
+    <span *ngIf="toast.type==='error'">✖</span>
+    <span *ngIf="toast.type==='info'">ℹ</span>
+    {{ toast.message }}
+  </div>
+</div>
+
 <div class="space-y-6">
 
   <!-- Header -->
@@ -63,11 +76,18 @@
             {{ u.departamento }}
           </td>
 
-          <td class="px-6 py-4 text-center">
-            <button type="button" (click)="editPermissions(u)"
-              class="text-xs font-semibold text-blue-600 hover:text-blue-800 dark:text-orange-400 dark:hover:text-orange-300 transition">
-              Editar permisos
-            </button>
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-center gap-4">
+              <button type="button" (click)="editPermissions(u)"
+                class="text-xs font-semibold text-blue-600 hover:text-blue-800 dark:text-orange-400 dark:hover:text-orange-300 transition">
+                Editar permisos
+              </button>
+
+              <button type="button" (click)="openResetPassword(u)"
+                class="text-xs font-semibold text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 transition">
+                Resetear contraseña
+              </button>
+            </div>
           </td>
 
         </tr>
@@ -135,6 +155,52 @@
   </div>
 </div>
 
+<!-- ================== MODAL RESETEO CONTRASEÑA ================== -->
+<div *ngIf="isResettingPassword && selectedEmployeeForPassword"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+
+  <div class="w-full max-w-lg rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 p-6">
+    <h3 class="text-base font-semibold text-slate-800 dark:text-white">
+      Resetear contraseña
+    </h3>
+
+    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+      Usuario:
+      <span class="font-semibold text-slate-700 dark:text-slate-200">
+        {{ selectedEmployeeForPassword.nombre }} {{ selectedEmployeeForPassword.apellido_paterno }}
+      </span>
+      ({{ selectedEmployeeForPassword.rol }})
+    </p>
+
+    <div class="mt-5 space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Nueva contraseña</label>
+        <input type="password" [(ngModel)]="resetPasswordData.newPassword"
+          class="form-input-hotel w-full dark:bg-slate-900 dark:border-slate-700 dark:text-white"
+          placeholder="Mínimo 4 caracteres">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Confirmar contraseña</label>
+        <input type="password" [(ngModel)]="resetPasswordData.confirmPassword"
+          class="form-input-hotel w-full dark:bg-slate-900 dark:border-slate-700 dark:text-white"
+          placeholder="Repite la nueva contraseña">
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button type="button" (click)="cancelResetPassword()"
+        class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white">
+        Cancelar
+      </button>
+
+      <button type="button" (click)="saveResetPassword()"
+        class="px-6 py-2 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-md">
+        Guardar nueva contraseña
+      </button>
+    </div>
+  </div>
+</div>
 
 
 <!-- 🚫 ACCESO DENEGADO -->

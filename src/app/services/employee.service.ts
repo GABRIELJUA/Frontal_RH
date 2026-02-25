@@ -44,4 +44,12 @@ export class EmployeeService {
   );
 }
 
+  resetPassword(id: number, new_password: string) {
+    return this.http.patch(
+      `${this.employeesUrl}/${id}/reset-password`,
+      { new_password },
+      { withCredentials: true }
+    );
+  }
+
 }

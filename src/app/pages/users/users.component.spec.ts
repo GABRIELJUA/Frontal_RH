@@ -1,5 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UsersComponent, Employee } from './users.component';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { UsersComponent } from './users.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AuthService } from '../../services/auth.service';
 import { EmployeeService } from '../../services/employee.service';
@@ -19,13 +19,14 @@ describe('UsersComponent', () => {
     const authSpy = jasmine.createSpyObj('AuthService', ['getMe']);
     const employeeSpy = jasmine.createSpyObj('EmployeeService', [
       'getEmployees',
-      'updatePermissions'
+      'updatePermissions',
+      'resetPassword'
     ]);
 
-    // 🔥 Valores por defecto (muy importante)
     authSpy.getMe.and.returnValue(of({ rol: 'ADMIN' }));
     employeeSpy.getEmployees.and.returnValue(of([]));
     employeeSpy.updatePermissions.and.returnValue(of({}));
+    employeeSpy.resetPassword.and.returnValue(of({}));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -48,7 +49,6 @@ describe('UsersComponent', () => {
     spyOn(router, 'navigate');
   });
 
-  // ✅ 1
   it('Debe crearse el componente', () => {
 
     authService.getMe.and.returnValue(of({ rol: 'ADMIN' }));
@@ -59,7 +59,6 @@ describe('UsersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // ✅ 2 No ADMIN
   it('Debe bloquear acceso si no es ADMIN', () => {
 
     authService.getMe.and.returnValue(of({ rol: 'EMPLEADO' }));
@@ -69,7 +68,6 @@ describe('UsersComponent', () => {
     expect(component.hasAccess).toBeFalse();
   });
 
-  // ✅ 3 ADMIN carga empleados
   it('Debe cargar empleados si es ADMIN', () => {
 
     authService.getMe.and.returnValue(of({ rol: 'ADMIN' }));
@@ -86,11 +84,10 @@ describe('UsersComponent', () => {
     fixture.detectChanges();
 
     expect(employeeService.getEmployees).toHaveBeenCalled();
-    expect(component.employees.length).toBe(1); // Filtra EMPLEADO
+    expect(component.employees.length).toBe(1);
     expect(component.loading).toBeFalse();
   });
 
-  // ✅ 4 Error al cargar empleados
   it('Debe manejar error al cargar empleados', () => {
 
     authService.getMe.and.returnValue(of({ rol: 'ADMIN' }));
@@ -104,7 +101,6 @@ describe('UsersComponent', () => {
     expect(component.errorMessage).toBe('Error al cargar usuarios del sistema');
   });
 
-  // ✅ 5 Guardar permisos
   it('Debe actualizar permisos correctamente', () => {
 
     component.selectedEmployee = {
@@ -119,17 +115,83 @@ describe('UsersComponent', () => {
 
     employeeService.updatePermissions.and.returnValue(of({}));
 
-    spyOn(window, 'alert');
-
     component.savePermissions();
 
     expect(employeeService.updatePermissions).toHaveBeenCalledWith(1, 'ADMIN_EDITOR');
   });
 
-  // ✅ 6 Navegación
+  it('Debe resetear contraseña cuando la confirmación es válida', () => {
+    component.selectedEmployeeForPassword = {
+      id_empleado: 2,
+      num_nomina: '2',
+      rol: 'ADMIN_LECTURA',
+      nombre: 'Test',
+      apellido_paterno: 'User',
+      apellido_materno: '',
+      fecha_nacimiento: '',
+      sexo: '',
+      estado_civil: '',
+      rfc: '',
+      curp: '',
+      nss: '',
+      correo: '',
+      fecha_ingreso: '',
+      puesto: '',
+      departamento: ''
+    };
+
+    component.resetPasswordData = {
+      newPassword: '1234',
+      confirmPassword: '1234'
+    };
+
+    component.saveResetPassword();
+
+    expect(employeeService.resetPassword).toHaveBeenCalledWith(2, '1234');
+  });
+
+  it('Debe bloquear reseteo si las contraseñas no coinciden', () => {
+    component.selectedEmployeeForPassword = {
+      id_empleado: 2,
+      num_nomina: '2',
+      rol: 'ADMIN_LECTURA',
+      nombre: 'Test',
+      apellido_paterno: 'User',
+      apellido_materno: '',
+      fecha_nacimiento: '',
+      sexo: '',
+      estado_civil: '',
+      rfc: '',
+      curp: '',
+      nss: '',
+      correo: '',
+      fecha_ingreso: '',
+      puesto: '',
+      departamento: ''
+    };
+
+    component.resetPasswordData = {
+      newPassword: '1234',
+      confirmPassword: '12345'
+    };
+
+    component.saveResetPassword();
+
+    expect(employeeService.resetPassword).not.toHaveBeenCalled();
+    expect(component.toast.type).toBe('error');
+  });
+
   it('Debe navegar a /admin', () => {
     component.goToAdmin();
     expect(router.navigate).toHaveBeenCalledWith(['/admin']);
   });
+
+  it('Debe ocultar el toast automáticamente', fakeAsync(() => {
+    component.toastMsg('ok', 'success');
+
+    expect(component.toast.show).toBeTrue();
+    tick(3000);
+    expect(component.toast.show).toBeFalse();
+  }));
 
 });
