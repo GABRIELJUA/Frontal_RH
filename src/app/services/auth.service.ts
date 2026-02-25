@@ -2,43 +2,53 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface LoginCredentials {
+  num_nomina: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id?: number;
+  nombre?: string;
+  rol: string;
+}
+
+export interface LoginResponse {
+  user: AuthUser;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly apiUrl = 'http://localhost:3000/api/auth';
 
-  private apiUrl = 'http://localhost:3000/api/auth';
+  constructor(private readonly http: HttpClient) {}
 
-
-  constructor(private http: HttpClient) {}
-
-  login(credentials: any): Observable<any> {
-    return this.http.post(
+  login(credentials: LoginCredentials): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
       `${this.apiUrl}/login`,
       credentials,
       { withCredentials: true }
     );
   }
 
-    // Logout
-  logout(): Observable<any> {
-    return this.http.post(
+  logout(): Observable<void> {
+    return this.http.post<void>(
       `${this.apiUrl}/logout`,
       {},
-      { withCredentials: true } // necesario para borrar la cookie
+      { withCredentials: true }
     );
   }
 
-  checkAuth() {
-  return this.http.get(
-    `${this.apiUrl}/me`,
-    { withCredentials: true }
-  );
-}
+  checkAuth(): Observable<AuthUser> {
+    return this.http.get<AuthUser>(
+      `${this.apiUrl}/me`,
+      { withCredentials: true }
+    );
+  }
 
-
-getMe() {
-  return this.http.get(`${this.apiUrl}/me`, { withCredentials: true });
-}
-
+  getMe(): Observable<AuthUser> {
+    return this.checkAuth();
+  }
 }
