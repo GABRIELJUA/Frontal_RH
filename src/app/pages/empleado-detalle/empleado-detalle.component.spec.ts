@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EmpleadoDetalleComponent } from './empleado-detalle.component';
 import { EmployeeService } from '../../services/employee.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,7 @@ describe('EmpleadoDetalleComponent', () => {
 
   beforeEach(async () => {
 
-    employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getEmployeeById']);
+    employeeServiceSpy = jasmine.createSpyObj('EmployeeService', ['getEmployeeById', 'resetPassword']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -27,7 +27,7 @@ describe('EmpleadoDetalleComponent', () => {
           useValue: {
             snapshot: {
               paramMap: {
-                get: () => '1'  // 👈 simulamos id = 1
+                get: () => '1'
               }
             }
           }
@@ -37,9 +37,9 @@ describe('EmpleadoDetalleComponent', () => {
 
     fixture = TestBed.createComponent(EmpleadoDetalleComponent);
     component = fixture.componentInstance;
+    employeeServiceSpy.resetPassword.and.returnValue(of({}));
   });
 
-  // ✅ 1
   it('Debe crearse el componente', () => {
 
     employeeServiceSpy.getEmployeeById.and.returnValue(of({} as any));
@@ -49,7 +49,6 @@ describe('EmpleadoDetalleComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // ✅ 2
   it('Debe cargar empleado correctamente', () => {
 
     const mockEmployee = {
@@ -75,18 +74,15 @@ describe('EmpleadoDetalleComponent', () => {
       nss: 'NSS123'
     };
 
-    employeeServiceSpy.getEmployeeById.and.returnValue(of(mockEmployee));
+    employeeServiceSpy.getEmployeeById.and.returnValue(of(mockEmployee as any));
 
     fixture.detectChanges();
 
-    expect(component.employee).toEqual(mockEmployee);
+    expect(component.employee).toEqual(mockEmployee as any);
     expect(component.loading).toBeFalse();
   });
 
-  // ✅ 3
   it('Debe redirigir si ocurre error al cargar empleado', () => {
-
-    spyOn(window, 'alert');
 
     employeeServiceSpy.getEmployeeById.and.returnValue(
       throwError(() => new Error('Error'))
@@ -94,8 +90,66 @@ describe('EmpleadoDetalleComponent', () => {
 
     fixture.detectChanges();
 
-    expect(window.alert).toHaveBeenCalledWith('No se pudo cargar el empleado');
+    expect(component.errorMessage).toBe('No se pudo cargar el empleado');
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/employees']);
   });
+
+  it('Debe resetear contraseña si la confirmación es válida', () => {
+    const mockEmployee = {
+      id_empleado: 1,
+      num_nomina: '123',
+      rol: 'EMPLEADO',
+      nombre: 'Juan',
+      apellido_paterno: 'Perez'
+    } as any;
+
+    employeeServiceSpy.getEmployeeById.and.returnValue(of(mockEmployee));
+
+    fixture.detectChanges();
+
+    component.openResetPassword();
+    component.resetPasswordData = {
+      newPassword: '1234',
+      confirmPassword: '1234'
+    };
+
+    component.saveResetPassword();
+
+    expect(employeeServiceSpy.resetPassword).toHaveBeenCalledWith(1, '1234');
+    expect(component.isResettingPassword).toBeFalse();
+  });
+
+  it('Debe bloquear reseteo si las contraseñas no coinciden', () => {
+    const mockEmployee = {
+      id_empleado: 1,
+      num_nomina: '123',
+      rol: 'EMPLEADO',
+      nombre: 'Juan',
+      apellido_paterno: 'Perez'
+    } as any;
+
+    employeeServiceSpy.getEmployeeById.and.returnValue(of(mockEmployee));
+
+    fixture.detectChanges();
+
+    component.openResetPassword();
+    component.resetPasswordData = {
+      newPassword: '1234',
+      confirmPassword: '9999'
+    };
+
+    component.saveResetPassword();
+
+    expect(employeeServiceSpy.resetPassword).not.toHaveBeenCalled();
+    expect(component.toast.type).toBe('error');
+  });
+
+  it('Debe ocultar el toast automáticamente', fakeAsync(() => {
+    component.toastMsg('ok', 'success');
+
+    expect(component.toast.show).toBeTrue();
+    tick(3000);
+    expect(component.toast.show).toBeFalse();
+  }));
 
 });
